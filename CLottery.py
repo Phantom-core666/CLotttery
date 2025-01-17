@@ -6,6 +6,12 @@ import random
 import os
 import json
 
+# 添加路径判断代码
+if getattr(sys, 'frozen', False):
+    basedir = sys._MEIPASS
+else:
+    basedir = os.path.dirname(__file__)
+
 # 定义隐藏设置对话框类
 class HiddenSettingsDialog(QDialog):
     def __init__(self, names, probabilities, parent=None):
@@ -28,7 +34,7 @@ class HiddenSettingsDialog(QDialog):
 
         # 创建滚动区域，用于容纳可能超出窗口大小的内容
         scroll_area = QScrollArea()
-        scroll_area.setWidgetResizable(True)  # 允许滚动区域内的控件调整大小
+        scroll_area.setWidgetResizable(True)  
         main_layout.addWidget(scroll_area)
 
         # 创建一个容器小部件，并设置表单布局
@@ -45,12 +51,12 @@ class HiddenSettingsDialog(QDialog):
         # 为每个名字创建一个概率输入框
         for name in self.names:
             probabilitySpinBox = QDoubleSpinBox()
-            probabilitySpinBox.setRange(0, 100)  # 设置概率值的范围
-            probabilitySpinBox.setDecimals(2)  # 设置小数点后的位数
-            probabilitySpinBox.setValue(self.probabilities.get(name, 0))  # 设置初始值
+            probabilitySpinBox.setRange(0, 100)  
+            probabilitySpinBox.setDecimals(2)  
+            probabilitySpinBox.setValue(self.probabilities.get(name, 0))  
             probabilitySpinBox.valueChanged.connect(lambda value, n=name: self.updateDynamicProbabilities(n, value))  # 连接信号到槽函数
-            layout.addRow(name, probabilitySpinBox)  # 将名字和对应的输入框添加到表单布局中
-            self.probabilitySpinBoxes[name] = probabilitySpinBox  # 存储输入框控件
+            layout.addRow(name, probabilitySpinBox)  
+            self.probabilitySpinBoxes[name] = probabilitySpinBox  
 
         # 添加平均分配概率按钮
         equalizeButton = QPushButton('重置')
@@ -60,9 +66,9 @@ class HiddenSettingsDialog(QDialog):
         # 添加保存按钮
         saveButton = QPushButton('保存')
         saveButton.clicked.connect(self.saveProbabilities)  # 连接按钮点击信号到槽函数
-        main_layout.addWidget(saveButton)  # 将按钮添加到布局中
+        main_layout.addWidget(saveButton)  
 
-        self.setLayout(main_layout)  # 设置对话框的主布局
+        self.setLayout(main_layout)  
 
     def updateDynamicProbabilities(self, name, value):
         # 更新指定名字的概率值
@@ -111,7 +117,7 @@ class LotteryResultDialog(QDialog):
 
     def initUI(self):
         self.setWindowTitle('抽号')
-        self.setGeometry(300, 300, 400, 200)
+        self.setGeometry(300, 300, 300, 300)
         self.setStyleSheet("""
             QDialog { border-radius: 10px; background-color: #f0f0f0; }
             QLabel { font-size: 24px; color: #333; }
@@ -130,7 +136,7 @@ class LotteryResultDialog(QDialog):
         self.setLayout(layout)
 
     def startLottery(self):
-        if self.startButton is not None:  # 检查 startButton 是否已初始化
+        if self.startButton is not None: 
             self.startButton.setEnabled(False)  
 
         if self.names:
@@ -146,16 +152,16 @@ class LotteryResultDialog(QDialog):
                     self.winner = name 
                     break
 
-            # 延迟显示最终结果，并解锁“开始”按钮
+            # 延迟显示结果，解锁“开始”按钮
             QTimer.singleShot(3000, self.showResultAndEnableButton)  
         else:
             QMessageBox.warning(self, '警告', '没有名字可供抽取，请先添加名字！')
-            if self.startButton is not None:  # 检查 startButton 是否已初始化
+            if self.startButton is not None:  
                 self.startButton.setEnabled(True) 
 
     def showResultAndEnableButton(self):
         self.showResult()
-        if self.startButton is not None:  # 检查 startButton 是否已初始化
+        if self.startButton is not None:  
             self.startButton.setEnabled(True)  
 
     def showResult(self):
@@ -186,6 +192,13 @@ class AboutDialog(QDialog):
 
         layout = QVBoxLayout()
 
+        # 添加软件图标
+        icon_label = QLabel()
+        pixmap = QPixmap(os.path.join(basedir, "icon.ico"))
+        icon_label.setPixmap(pixmap)
+        icon_label.setAlignment(Qt.AlignmentFlag.AlignCenter) 
+        layout.addWidget(icon_label)
+
         aboutText = QLabel("CLottery 是一款简单的能够随机抽号的app。其提供了直观的图形化编辑窗口。\n此软件基于 PyQt6 开发，完全免费且开源。\n由 Phantom core开发")
         aboutText.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(aboutText)
@@ -195,18 +208,18 @@ class AboutDialog(QDialog):
 
         githubButton = QPushButton()
         githubButton.setText("此项目的 GitHub")
-        pixmap = QPixmap("Octicons-mark-github.svg") 
+        pixmap = QPixmap(os.path.join(basedir, "Octicons-mark-github.svg")) 
         githubButton.setIcon(QIcon(pixmap))
         githubButton.setIconSize(QSize(24, 24))  
-        githubButton.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com")))  
+        githubButton.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://github.com/Phantom-core666/CLotttery")))   
         buttonLayout.addWidget(githubButton)
 
         bilibiliButton = QPushButton()
         bilibiliButton.setText("我的 哔哩哔哩 主页")
-        pixmap = QPixmap("bilibili-website.favicon.svg") 
+        pixmap = QPixmap(os.path.join(basedir, "bilibili-website.favicon.svg")) 
         bilibiliButton.setIcon(QIcon(pixmap))
         bilibiliButton.setIconSize(QSize(24, 24))  
-        bilibiliButton.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://space.bilibili.com/3546560566659226")))  
+        bilibiliButton.clicked.connect(lambda: QDesktopServices.openUrl(QUrl("https://space.bilibili.com/3546560566659226")))   
         buttonLayout.addWidget(bilibiliButton)
 
         layout.addLayout(buttonLayout)
@@ -223,7 +236,7 @@ class ClassroomLottery(QWidget):
         self.loadProgramState() 
 
     def initUI(self):
-        self.setWindowTitle('课堂抽号机')
+        self.setWindowTitle('CLottery v1.0.0')
         self.setGeometry(300, 300, 400, 350)
         self.setStyleSheet("""
             QWidget {
@@ -280,28 +293,25 @@ class ClassroomLottery(QWidget):
         # 连接输入框的回车信号到addName槽函数
         self.nameInput.returnPressed.connect(self.addName)
 
-        # 创建快捷键，用于快速打开隐藏设置对话框
+        # 创建快捷键，用于打开隐藏设置对话框
         self.hiddenShortcut = QShortcut(QKeySequence('Ctrl+Shift+H'), self)
         self.hiddenShortcut.activated.connect(self.openHiddenSettings)
 
     def openLotteryResultDialog(self):
         # 打开抽号结果对话框
         dialog = LotteryResultDialog(self.names, self.probabilities, self)
-        # 设置新窗口的位置在原窗口的右侧
         dialog.setGeometry(self.geometry().right(), self.geometry().top(), 400, 200)
         dialog.exec()
 
     def openAboutDialog(self):
         # 打开关于对话框
         dialog = AboutDialog(self)
-        # 设置新窗口的位置在原窗口的下方
         dialog.setGeometry(self.geometry().left(), self.geometry().bottom(), 400, 200)
         dialog.exec()
 
     def openHiddenSettings(self):
         # 打开隐藏设置对话框
         dialog = HiddenSettingsDialog(self.names, self.probabilities, self)
-        # 设置新窗口的位置在原窗口的右侧下方
         dialog.setGeometry(self.geometry().right(), self.geometry().bottom(), 400, 300)
         if dialog.exec() == QDialog.DialogCode.Accepted:
             self.saveProgramState()
@@ -318,9 +328,9 @@ class ClassroomLottery(QWidget):
             for n in self.names:
                 self.probabilities[n] = new_prob 
             self.nameInput.clear()  
-            self.nameListWidget.addItem(name)  # 将名字添加到列表控件
+            self.nameListWidget.addItem(name) 
             QMessageBox.information(self, '提示', f'已添加名字：{name}')  
-            self.saveProgramState()  # 保存程序状态
+            self.saveProgramState() 
             # 如果隐藏设置对话框已打开，更新它的概率值
             if hasattr(self, 'hiddenSettingsDialog') and self.hiddenSettingsDialog:
                 self.hiddenSettingsDialog.updateProbabilities(self.names, self.probabilities)
@@ -333,12 +343,12 @@ class ClassroomLottery(QWidget):
         # 获取列表控件中选中的项
         selectedItems = self.nameListWidget.selectedItems()
         if selectedItems:
-            name = selectedItems[0].text()  # 获取选中项的名字
-            self.names.remove(name)  # 从名字列表中移除
-            del self.probabilities[name]  # 从概率字典中移除
-            self.nameListWidget.takeItem(self.nameListWidget.row(selectedItems[0]))  # 从列表控件中移除
+            name = selectedItems[0].text() 
+            self.names.remove(name)  
+            del self.probabilities[name]  
+            self.nameListWidget.takeItem(self.nameListWidget.row(selectedItems[0]))  
             QMessageBox.information(self, '提示', f'已删除名字：{name}') 
-            self.saveProgramState()  # 保存程序状态
+            self.saveProgramState()  
         else:
             QMessageBox.warning(self, '警告', '请选择要删除的名字！')
 
